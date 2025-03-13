@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Reflection Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+    <style>
+        /* General styling */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* Prevent body from scrolling */
+            font-family: 'Lato', sans-serif; /* Ensure consistent font across the page */
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            font-size: 1.2em;
+            margin-top: 30px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 5px;
+        }
+
+        /* Form styling */
+        form {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 1000px;
+            margin: auto;
+            transition: box-shadow 0.3s ease;
+        }
+
+        form:hover {
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #4a4a4a;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            background-color: #fafafa;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #ffffff;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        textarea {
+            width: 100%; /* Make it full width */
+            min-height: 50px; /* Set a minimum height */
+            overflow: hidden; /* Hide overflow */
+            resize: none; /* Prevent manual resizing */
+            padding: 10px; /* Add some padding */
+            border: 1px solid #ccc; /* Add a border */
+            border-radius: 5px; /* Rounded corners */
+        }
+
+        /* Quality of Life Dashboard layout */
+        .quality-of-life {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .quality-of-life .field {
+            flex: 1;
+        }
+
+        .quality-of-life label {
+            font-weight: normal;
+            color: #333;
+        }
+
+        /* Collapsible section styling */
+        .collapsible {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #3498db;
+            transition: color 0.3s ease;
+        }
+
+        .collapsible:hover {
+            color: #2980b9;
+        }
+
+        .collapsible .triangle {
+            margin-right: 8px;
+            transition: transform 0.3s;
+        }
+
+        .collapsible-content {
+            display: none;
+            margin-top: 10px;
+            padding-left: 20px;
+            transition: max-height 0.3s ease;
+        }
+
+        /* Button styling */
+        .button {
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .date-field {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .date-field label {
+            margin-right: 10px;
+            font-weight: bold;
+            color: #4a4a4a;
+        }
+
+        .date-field input[type="date"] {
+            width: auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            background-color: #fafafa;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s ease;
+        }
+
+        .date-field input[type="date"]:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #ffffff;
+        }
+
+        /* View mode styling */
+        .view-mode {
+            display: none;
+            font-style: italic;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        /* Container styling */
+        .container {
+            display: flex;
+            height: 100vh; /* Full viewport height */
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #f0f0f0;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed; /* Fix the sidebar position */
+            top: 0;
+            bottom: 0;
+            overflow-y: auto; /* Make sidebar independently scrollable */
+            font-family: 'Lato', sans-serif; /* Ensure consistent font in sidebar */
+        }
+
+        .sidebar .button {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        #entryList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #entryList li {
+            padding: 10px;
+            background-color: #ffffff;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Lato', sans-serif; /* Ensure consistent font in entry list */
+        }
+
+        #entryList li:hover {
+            background-color: #e0e0e0;
+        }
+
+        #entryList li.selected {
+            background-color: #3498db; /* Highlight color */
+            color: #ffffff; /* Text color for contrast */
+            font-weight: bold; /* Make text bold */
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px; /* Offset by sidebar width */
+            padding: 20px;
+            overflow-y: auto; /* Make main content scrollable */
+            height: 100vh; /* Full viewport height */
+        }
+
+        .quality-of-life-list {
+            margin-top: 15px;
+        }
+
+        .quality-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .quality-item label {
+            width: 100px;
+            font-weight: normal;
+            color: #333;
+        }
+
+        .quality-item input[type="number"] {
+            flex: 0 0 40px; /* Fixed width for the number input */
+            margin-right: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            background-color: #fafafa;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s ease;
+        }
+
+        .quality-item input[type="text"] {
+            flex: 1; /* Allow text input to grow */
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            background-color: #fafafa;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s ease;
+        }
+
+        .quality-item input:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #ffffff;
+        }
+
+        .quality-item .view-mode {
+            flex: 2; /* Allow view-mode text to take more space */
+            margin-left: 10px;
+            font-style: italic;
+            color: #555;
+        }
+
+        @media print {
+            body, html {
+                height: auto; /* Allow content to expand */
+                overflow: visible; /* Ensure all content is visible */
+            }
+
+            .container {
+                display: block; /* Ensure container is block-level for printing */
+                height: auto; /* Allow container to expand */
+            }
+
+            .sidebar, .button-container {
+                display: none; /* Hide non-essential elements for printing */
+            }
+
+            .main-content {
+                margin-left: 0; /* Remove sidebar offset */
+                padding: 0; /* Remove padding for full-width content */
+                overflow: visible; /* Ensure all content is visible */
+            }
+
+            .collapsible-content {
+                display: block !important; /* Ensure all sections are expanded */
+            }
+
+            .quality-item {
+                page-break-inside: avoid; /* Avoid breaking quality items across pages */
+            }
+        }
+
+        /* Default Theme */
+        body.default-theme {
+            background-color: #ffffff;
+            color: #2c3e50;
+        }
+        .button.default-theme {
+            background-color: #3498db;
+            color: #ffffff;
+        }
+        .button.default-theme:hover {
+            background-color: #2980b9;
+        }
+
+        /* Dark Theme */
+        body.dark-theme {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+        }
+        .button.dark-theme {
+            background-color: #2980b9;
+            color: #ffffff;
+        }
+        .button.dark-theme:hover {
+            background-color: #3498db;
+        }
+
+        /* Light Theme */
+        body.light-theme {
+            background-color: #f0f0f0;
+            color: #333333;
+        }
+        .button.light-theme {
+            background-color: #3498db;
+            color: #ffffff;
+        }
+        .button.light-theme:hover {
+            background-color: #2980b9;
+        }
+
+        /* Colorful Theme */
+        body.colorful-theme {
+            background-color: #ffeb3b;
+            color: #3f51b5;
+        }
+        .button.colorful-theme {
+            background-color: #e91e63;
+            color: #ffffff;
+        }
+        .button.colorful-theme:hover {
+            background-color: #d81b60;
+        }
+
+        /* Homebrew Theme */
+        body.homebrew-theme {
+            background-color: #000000; /* Black background */
+            color: #00ff00; /* Green text */
+        }
+        .button.homebrew-theme {
+            background-color: #005f00; /* Dark green button */
+            color: #00ff00; /* Green text */
+        }
+        .button.homebrew-theme:hover {
+            background-color: #007f00; /* Lighter dark green on hover */
+        }
+
+        /* Homebrew Theme Form Styles */
+        body.homebrew-theme input[type="text"],
+        body.homebrew-theme input[type="date"],
+        body.homebrew-theme input[type="number"],
+        body.homebrew-theme textarea {
+            background-color: #000000; /* Black background for inputs */
+            color: #00ff00; /* Green text for inputs */
+            border: 1px solid #00ff00; /* Green border */
+            border-radius: 5px; /* Rounded corners */
+            padding: 10px; /* Padding for inputs */
+            font-family: 'Courier New', monospace; /* Monospace font for terminal feel */
+        }
+
+        body.homebrew-theme input[type="text"]:focus,
+        body.homebrew-theme input[type="date"]:focus,
+        body.homebrew-theme input[type="number"]:focus,
+        body.homebrew-theme textarea:focus {
+            outline: none; /* Remove outline */
+            border-color: #007f00; /* Lighter green border on focus */
+            background-color: #1a1a1a; /* Darker background on focus */
+        }
+
+        body.homebrew-theme label {
+            color: #00ff00; /* Green text for labels */
+            font-weight: bold; /* Bold labels */
+        }
+    </style>
+</head>
+<body class="default-theme">
+    <div class="container">
+        <div class="sidebar">
+            <label for="themeSelector">Select Theme:</label>
+            <select id="themeSelector" onchange="changeTheme()">
+                <option value="default">Default</option>
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="colorful">Colorful</option>
+                <option value="homebrew">Homebrew</option>
+            </select>
+            <button class="button" onclick="addNewEntry()">Add New Entry</button>
+            <ul id="entryList"></ul>
+        </div>
+        <div class="main-content">
+            <h1 id="pageHeader">Reflection Form</h1>
+            <div class="button-container">
+                <button id="toggleMode" class="button" onclick="toggleMode()">Switch to View Mode</button>
+                <button id="printPage" class="button" onclick="printViewMode()">🖨️ Print</button>
+                <button type="button" class="button" onclick="downloadAsJSON()">Download as JSON</button>
+                <input type="file" id="uploadJson" accept=".json" style="display: none;" onchange="uploadJSON(event)" />
+                <button type="button" class="button" onclick="document.getElementById('uploadJson').click()">Upload JSON</button>
+            </div>
+            <form id="reflectionForm">
+                <!-- Date Field at the Top -->
+                <div class="date-field">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" oninput="saveData('date'); updateTitle()" />
+                    <span class="view-mode" id="view-date"></span>
+                </div>
+
+                <!-- One Word Opener -->
+                <label for="oneWordOpener">One Word Opener:</label>
+                <input type="text" id="oneWordOpener" oninput="saveData('oneWordOpener')" placeholder="One word" />
+                <span class="view-mode" id="view-oneWordOpener"></span>
+
+                <!-- Quality of Life Dashboard -->
+                <h2>Quality of Life Dashboard (1-10: 5 is average)</h2>
+                <div class="quality-of-life-list">
+                    <div class="quality-item">
+                        <label for="business">Business:</label>
+                        <input type="number" id="business" oninput="saveData('business')" min="1" max="10" />
+                        <input type="text" id="businessExplanation" placeholder="Explanation" oninput="saveData('businessExplanation')" />
+                        <span class="view-mode" id="view-business"></span>
+                        <span class="view-mode" id="view-businessExplanation"></span>
+                    </div>
+                    <div class="quality-item">
+                        <label for="family">Family:</label>
+                        <input type="number" id="family" oninput="saveData('family')" min="1" max="10" />
+                        <input type="text" id="familyExplanation" placeholder="Explanation" oninput="saveData('familyExplanation')" />
+                        <span class="view-mode" id="view-family"></span>
+                        <span class="view-mode" id="view-familyExplanation"></span>
+                    </div>
+                    <div class="quality-item">
+                        <label for="personal">Personal/Self:</label>
+                        <input type="number" id="personal" oninput="saveData('personal')" min="1" max="10" />
+                        <input type="text" id="personalExplanation" placeholder="Explanation" oninput="saveData('personalExplanation')" />
+                        <span class="view-mode" id="view-personal"></span>
+                        <span class="view-mode" id="view-personalExplanation"></span>
+                    </div>
+                    <div class="quality-item">
+                        <label for="financial">Financial:</label>
+                        <input type="number" id="financial" oninput="saveData('financial')" min="1" max="10" />
+                        <input type="text" id="financialExplanation" placeholder="Explanation" oninput="saveData('financialExplanation')" />
+                        <span class="view-mode" id="view-financial"></span>
+                        <span class="view-mode" id="view-financialExplanation"></span>
+                    </div>
+                    <div class="quality-item">
+                        <label for="forum">Forum:</label>
+                        <input type="number" id="forum" oninput="saveData('forum')" min="1" max="10" />
+                        <input type="text" id="forumExplanation" placeholder="Explanation" oninput="saveData('forumExplanation')" />
+                        <span class="view-mode" id="view-forum"></span>
+                        <span class="view-mode" id="view-forumExplanation"></span>
+                    </div>
+                    <div class="quality-item">
+                        <label for="physicalHealth">Physical:</label>
+                        <input type="number" id="physicalHealth" oninput="saveData('physicalHealth')" min="1" max="10" />
+                        <input type="text" id="physicalHealthExplanation" placeholder="Explanation" oninput="saveData('physicalHealthExplanation')" />
+                        <span class="view-mode" id="view-physicalHealth"></span>
+                        <span class="view-mode" id="view-physicalHealthExplanation"></span>
+                    </div>
+                    <div class="quality-item">
+                        <label for="mentalHealth">Mental:</label>
+                        <input type="number" id="mentalHealth" oninput="saveData('mentalHealth')" min="1" max="10" />
+                        <input type="text" id="mentalHealthExplanation" placeholder="Explanation" oninput="saveData('mentalHealthExplanation')" />
+                        <span class="view-mode" id="view-mentalHealth"></span>
+                        <span class="view-mode" id="view-mentalHealthExplanation"></span>
+                    </div>
+                    <div class="quality-item">
+                        <label for="friendsCommunity">Friends/Community:</label>
+                        <input type="number" id="friendsCommunity" oninput="saveData('friendsCommunity')" min="1" max="10" />
+                        <input type="text" id="friendsCommunityExplanation" placeholder="Explanation" oninput="saveData('friendsCommunityExplanation')" />
+                        <span class="view-mode" id="view-friendsCommunity"></span>
+                        <span class="view-mode" id="view-friendsCommunityExplanation"></span>
+                    </div>
+                </div>
+
+                <!-- Aims and Aspirations -->
+                <h2>Aims and Aspirations</h2>
+                <label for="aimsAspirations">Describe your aims and aspirations:</label>
+                <textarea id="aimsAspirations" rows="5" oninput="saveData('aimsAspirations'); autoResize(this);"></textarea>
+                <div class="view-mode" id="view-aimsAspirations"></div>
+
+                <!-- Three Most Meaningful Things -->
+                <h2>Three Most Meaningful Things</h2>
+                <!-- Collapsible Section: Number One -->
+                <div class="collapsible" onclick="toggleSection('content1', 'triangle1', 'headline1')">
+                    <span class="triangle" id="triangle1">▶</span>
+                    <span id="displayHeadline1" data-default="Number One">Number One</span>
+                </div>
+                <div class="collapsible-content" id="content1">
+                    <label for="headline1">Headline (One sentence or less):</label>
+                    <input type="text" id="headline1" oninput="saveData('headline1'); updateHeadlineDisplay('headline1', 'displayHeadline1')" />
+                    <span class="view-mode" id="view-headline1"></span>
+
+                    <label for="emotions1">Emotions/Feelings (List at least 3):</label>
+                    <input type="text" id="emotions1" oninput="saveData('emotions1')" placeholder="e.g., happy, reflective, grateful" />
+                    <span class="view-mode" id="view-emotions1"></span>
+
+                    <label for="significance1">Significance/Impact - Why is this significant to you? What is its impact on you or others?</label>
+                    <textarea id="significance1" rows="5" oninput="saveData('significance1'); autoResize(this);"></textarea>
+                    <div class="view-mode" id="view-significance1"></div>
+
+                    <label for="deepReflection1">What is deep inside me that nobody knows?</label>
+                    <textarea id="deepReflection1" rows="5" oninput="saveData('deepReflection1'); autoResize(this);"></textarea>
+                    <div class="view-mode" id="view-deepReflection1"></div>
+                </div>
+
+                <!-- Collapsible Section: Number Two -->
+                <div class="collapsible" onclick="toggleSection('content2', 'triangle2', 'headline2')">
+                    <span class="triangle" id="triangle2">▶</span>
+                    <span id="displayHeadline2" data-default="Number Two">Number Two</span>
+                </div>
+                <div class="collapsible-content" id="content2">
+                    <label for="headline2">Headline (One sentence or less):</label>
+                    <input type="text" id="headline2" oninput="saveData('headline2'); updateHeadlineDisplay('headline2', 'displayHeadline2')" />
+                    <span class="view-mode" id="view-headline2"></span>
+
+                    <label for="emotions2">Emotions/Feelings (List at least 3):</label>
+                    <input type="text" id="emotions2" oninput="saveData('emotions2')" placeholder="e.g., inspired, hopeful, proud" />
+                    <span class="view-mode" id="view-emotions2"></span>
+
+                    <label for="significance2">Significance/Impact - Why is this significant to you? What is its impact on you or others?</label>
+                    <textarea id="significance2" rows="5" oninput="saveData('significance2'); autoResize(this);"></textarea>
+                    <div class="view-mode" id="view-significance2"></div>
+
+                    <label for="deepReflection2">What is deep inside me that nobody knows?</label>
+                    <textarea id="deepReflection2" rows="5" oninput="saveData('deepReflection2'); autoResize(this);"></textarea>
+                    <div class="view-mode" id="view-deepReflection2"></div>
+                </div>
+
+                <!-- Collapsible Section: Number Three -->
+                <div class="collapsible" onclick="toggleSection('content3', 'triangle3', 'headline3')">
+                    <span class="triangle" id="triangle3">▶</span>
+                    <span id="displayHeadline3" data-default="Number Three">Number Three</span>
+                </div>
+                <div class="collapsible-content" id="content3">
+                    <label for="headline3">Headline (One sentence or less):</label>
+                    <input type="text" id="headline3" oninput="saveData('headline3'); updateHeadlineDisplay('headline3', 'displayHeadline3')" />
+                    <span class="view-mode" id="view-headline3"></span>
+
+                    <label for="emotions3">Emotions/Feelings (List at least 3):</label>
+                    <input type="text" id="emotions3" oninput="saveData('emotions3')" placeholder="e.g., content, nostalgic, thoughtful" />
+                    <span class="view-mode" id="view-emotions3"></span>
+
+                    <label for="significance3">Significance/Impact - Why is this significant to you? What is its impact on you or others?</label>
+                    <textarea id="significance3" rows="5" oninput="saveData('significance3')"></textarea>
+                    <div class="view-mode" id="view-significance3"></div>
+
+                    <label for="deepReflection3">What is deep inside me that nobody knows?</label>
+                    <textarea id="deepReflection3" rows="5" oninput="saveData('deepReflection3')"></textarea>
+                    <div class="view-mode" id="view-deepReflection3"></div>
+                </div>
+
+                <!-- Success, Courage, Urgency -->
+                <h2>Success, Courage, Urgency</h2>
+                <label for="success">One success, accomplishment, win this past month I want you to celebrate with me:</label>
+                <textarea id="success" rows="3" oninput="saveData('success')"></textarea>
+                <div class="view-mode" id="view-success"></div>
+
+                <label for="sensitiveTopic">What’s something you don’t want to talk about but probably should?</label>
+                <textarea id="sensitiveTopic" rows="3" oninput="saveData('sensitiveTopic')"></textarea>
+                <div class="view-mode" id="view-sensitiveTopic"></div>
+
+                <label for="courage">If I were to seek courage and clarity on something, it would be:</label>
+                <textarea id="courage" rows="3" oninput="saveData('courage')"></textarea>
+                <div class="view-mode" id="view-courage"></div>
+
+                <label for="urgency">Urgency (1-10):</label>
+                <input type="number" id="urgency" oninput="saveData('urgency')" min="1" max="10" />
+                <span class="view-mode" id="view-urgency"></span>
+
+                <label for="importance">Importance (1-10):</label>
+                <input type="number" id="importance" oninput="saveData('importance')" min="1" max="10" />
+                <span class="view-mode" id="view-importance"></span>
+            </form>
+        </div>
+    </div>
+    <script>
+    let entries = [];
+    let currentEntryIndex = null;
+    let isEditMode = true;
+
+    // Load saved state from local storage
+    window.onload = function() {
+        const savedState = localStorage.getItem('appState');
+        if (savedState) {
+            const { savedEntries, lastIndex, lastMode } = JSON.parse(savedState);
+            entries = savedEntries || [];
+            currentEntryIndex = lastIndex !== null ? lastIndex : 0;
+            isEditMode = lastMode !== undefined ? lastMode : true;
+            updateEntryList();
+            if (entries.length > 0) {
+                loadEntry(currentEntryIndex);
+            }
+        }
+        autoResizeAllTextareas();
+    };
+
+    // Save state to local storage
+    function saveAppState() {
+        const appState = {
+            savedEntries: entries,
+            lastIndex: currentEntryIndex,
+            lastMode: isEditMode
+        };
+        localStorage.setItem('appState', JSON.stringify(appState));
+    }
+
+    // Update saveData function to call saveAppState
+    function saveData(id) {
+        if (currentEntryIndex !== null) {
+            entries[currentEntryIndex][id] = document.getElementById(id).value;
+            saveAppState(); // Save the app state whenever data is saved
+        }
+    }
+
+    // Update toggleMode function to save the mode state
+    function toggleMode() {
+        isEditMode = !isEditMode;
+        const toggleButton = document.getElementById('toggleMode');
+        const inputs = document.querySelectorAll('input, textarea');
+        const viewElements = document.querySelectorAll('.view-mode');
+
+        if (isEditMode) {
+            toggleButton.innerText = 'Switch to View Mode';
+            inputs.forEach(input => {
+                if (input.type !== 'file') { // Ensure file input remains hidden
+                    input.style.display = 'block';
+                }
+            });
+            viewElements.forEach(view => view.style.display = 'none');
+        } else {
+            toggleButton.innerText = 'Switch to Edit Mode';
+            inputs.forEach(input => input.style.display = 'none');
+            viewElements.forEach(view => {
+                const id = view.id.replace('view-', '');
+                const inputElement = document.getElementById(id);
+                if (inputElement) {
+                    view.innerText = inputElement.value;
+                }
+                view.style.display = 'block';
+            });
+        }
+        saveAppState(); // Save the app state whenever the mode is toggled
+    }
+
+    function addNewEntry() {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const newEntry = {
+            date: today,
+            oneWordOpener: '',
+            business: '',
+            businessExplanation: '',
+            family: '',
+            familyExplanation: '',
+            personal: '',
+            personalExplanation: '',
+            financial: '',
+            financialExplanation: '',
+            forum: '',
+            forumExplanation: '',
+            physicalHealth: '',
+            physicalHealthExplanation: '',
+            mentalHealth: '',
+            mentalHealthExplanation: '',
+            friendsCommunity: '',
+            friendsCommunityExplanation: '',
+            aimsAspirations: '',
+            headline1: '',
+            emotions1: '',
+            significance1: '',
+            deepReflection1: '',
+            headline2: '',
+            emotions2: '',
+            significance2: '',
+            deepReflection2: '',
+            headline3: '',
+            emotions3: '',
+            significance3: '',
+            deepReflection3: '',
+            success: '',
+            sensitiveTopic: '',
+            courage: '',
+            urgency: '',
+            importance: ''
+        };
+        entries.push(newEntry);
+        currentEntryIndex = entries.length - 1;
+        updateEntryList();
+        loadEntry(currentEntryIndex);
+    }
+
+
+    function deleteNavEntry(index) {
+        const confirmation = confirm("Are you sure you want to delete this entry? This action cannot be undone.");
+        if (confirmation) {
+            entries.splice(index, 1); // Remove the entry from the entries array
+            updateEntryList(); // Update the UI to reflect the changes
+        }
+    }
+
+    function updateEntryList() {
+        const entryList = document.getElementById('entryList');
+        entryList.innerHTML = '';
+
+        // Sort entries by date (newest to oldest)
+        entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        entries.forEach((entry, index) => {
+            const listItem = document.createElement('li');
+            const date = entry.date ? new Date(entry.date).toLocaleDateString() : 'No Date';
+            const oneWordOpener = entry.oneWordOpener || 'No Opener';
+            listItem.textContent = `${date} - ${oneWordOpener}`;
+            listItem.onclick = () => loadEntry(index);
+            entryList.appendChild(listItem);
+        });
+    }
+
+    function loadEntry(index) {
+        currentEntryIndex = index;
+        const entry = entries[index];
+        for (const key in entry) {
+            const element = document.getElementById(key);
+            if (element) {
+                element.value = entry[key];
+            }
+        }
+        updateTitle();
+        highlightSelectedEntry(index);
+
+        // Update headline displays on initial load
+        updateHeadlineDisplay('headline1', 'displayHeadline1');
+        updateHeadlineDisplay('headline2', 'displayHeadline2');
+        updateHeadlineDisplay('headline3', 'displayHeadline3');
+    }
+
+    function highlightSelectedEntry(index) {
+        const entryListItems = document.querySelectorAll('#entryList li');
+        entryListItems.forEach((item, idx) => {
+            if (idx === index) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    function saveData(id) {
+        if (currentEntryIndex !== null) {
+            entries[currentEntryIndex][id] = document.getElementById(id).value;
+        }
+        localStorage.setItem('entries', JSON.stringify(entries));
+    }
+
+    function updateTitle() {
+        const dateInput = document.getElementById('date').value;
+        if (dateInput) {
+            const date = new Date(dateInput);
+            const month = date.toLocaleString('default', { month: 'long' });
+            const year = date.getFullYear();
+            document.title = `Forum Deep 5% Reflections for ${month} ${year}`;
+            document.getElementById('pageHeader').innerText = `Forum Deep 5% Reflections for ${month} ${year}`;
+        }
+    }
+
+    window.onload = function() {
+        const savedEntries = localStorage.getItem('entries');
+        if (savedEntries) {
+            entries = JSON.parse(savedEntries);
+            updateEntryList();
+            if (entries.length > 0) {
+                loadEntry(0);
+            }
+        }
+        autoResizeAllTextareas();
+    };
+
+    function toggleSection(contentId, triangleId, headlineId) {
+        const content = document.getElementById(contentId);
+        const triangle = document.getElementById(triangleId);
+        const headline = document.getElementById(headlineId);
+
+        if (content.style.display === 'block') {
+            content.style.display = 'none';
+            triangle.style.transform = 'rotate(0deg)';
+        } else {
+            content.style.display = 'block';
+            triangle.style.transform = 'rotate(90deg)';
+        }
+    }
+
+    function updateHeadlineDisplay(inputId, displayId) {
+        const inputElement = document.getElementById(inputId);
+        const displayElement = document.getElementById(displayId);
+
+        if (inputElement && displayElement) {
+            const headlineText = inputElement.value.trim() || displayElement.dataset.default;
+            displayElement.textContent = headlineText;
+        }
+    }
+
+    function toggleMode() {
+        isEditMode = !isEditMode;
+        const toggleButton = document.getElementById('toggleMode');
+        const inputs = document.querySelectorAll('input, textarea');
+        const viewElements = document.querySelectorAll('.view-mode');
+
+        if (isEditMode) {
+            toggleButton.innerText = 'Switch to View Mode';
+            inputs.forEach(input => {
+                if (input.type !== 'file') { // Ensure file input remains hidden
+                    input.style.display = 'block';
+                }
+            });
+            viewElements.forEach(view => view.style.display = 'none');
+        } else {
+            toggleButton.innerText = 'Switch to Edit Mode';
+            inputs.forEach(input => input.style.display = 'none');
+            viewElements.forEach(view => {
+                const id = view.id.replace('view-', '');
+                const inputElement = document.getElementById(id);
+                if (inputElement) {
+                    view.innerText = inputElement.value;
+                }
+                view.style.display = 'block';
+            });
+        }
+    }
+
+    function splitLongString(longString, maxLength) {
+        const result = [];
+        for (let i = 0; i < longString.length; i += maxLength) {
+            result.push(longString.substring(i, i + maxLength));
+        }
+        return result;
+    }
+
+    function downloadAsJSON() {
+        if (currentEntryIndex === null) {
+            alert('No entry selected to download.');
+            return;
+        }
+
+        const entry = entries[currentEntryIndex];
+        const maxLength = 50; // Set the maximum length for each chunk
+
+        // Create a new object to hold the formatted entry
+        const formattedEntry = {};
+
+        for (const key in entry) {
+            if (typeof entry[key] === 'string' && entry[key].length > maxLength) {
+                // Split long strings into an array of shorter strings
+                formattedEntry[key] = splitLongString(entry[key], maxLength);
+            } else {
+                formattedEntry[key] = entry[key]; // Keep the original value if it's not a long string
+            }
+        }
+
+        const date = entry.date || 'unknown-date';
+        const filename = `reflections-${date}.json`;
+
+        const jsonStr = JSON.stringify(entry, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    function printViewMode() {
+        // Ensure the form is in view mode before printing
+        if (isEditMode) {
+            toggleMode();
+        }
+
+        // Expand all collapsible sections
+        const collapsibleContents = document.querySelectorAll('.collapsible-content');
+        const triangles = document.querySelectorAll('.triangle');
+
+        collapsibleContents.forEach(content => content.style.display = 'block');
+        triangles.forEach(triangle => triangle.style.transform = 'rotate(90deg)');
+
+        // Hide elements that shouldn't be printed
+        const buttons = document.querySelectorAll('.button-container, .sidebar');
+        buttons.forEach(button => button.style.display = 'none');
+
+        window.print();
+
+        // Restore the visibility of elements after printing
+        buttons.forEach(button => button.style.display = 'block');
+
+        // Collapse sections back to their original state
+        collapsibleContents.forEach(content => content.style.display = 'none');
+        triangles.forEach(triangle => triangle.style.transform = 'rotate(0deg)');
+
+        // Switch back to edit mode if needed
+        if (!isEditMode) {
+            toggleMode();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const clickSound = new Audio('click.mp3');
+
+        function playClickSound() {
+            clickSound.currentTime = 0; // Reset the sound to the start
+            clickSound.play();
+        }
+
+        const inputs = document.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('input', playClickSound);
+        });
+    });
+
+    function autoResize(textarea) {
+        textarea.style.height = 'auto'; // Reset height to auto to calculate new height
+        textarea.style.height = textarea.scrollHeight + 'px'; // Set height to scrollHeight
+    }
+
+    function autoResizeAllTextareas() {
+        const textareas = document.querySelectorAll('textarea'); // Select all textareas
+        textareas.forEach(textarea => {
+            autoResize(textarea); // Call autoResize for each textarea
+        });
+    }
+
+    function uploadJSON(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            alert('No file selected.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const jsonData = JSON.parse(e.target.result); // Parse the JSON data
+                // Check if the required fields exist in the JSON
+                if (jsonData.date && jsonData.oneWordOpener) {
+                    // Update the entries array with the new data
+                    entries.push(jsonData);
+                    currentEntryIndex = entries.length - 1; // Set the current entry index
+                    loadEntry(currentEntryIndex); // Load the new entry into the form
+                    updateEntryList(); // Update the entry list UI
+                } else {
+                    alert('Invalid JSON structure. Required fields are missing.');
+                }
+            } catch (error) {
+                alert('Error parsing JSON: ' + error.message); // Handle JSON parsing errors
+            }
+        };
+        reader.readAsText(file); // Read the file as text
+    }
+
+    function changeTheme() {
+        const themeSelector = document.getElementById('themeSelector');
+        const selectedTheme = themeSelector.value;
+
+        // Remove existing theme classes
+        document.body.classList.remove('default-theme', 'dark-theme', 'light-theme', 'colorful-theme', 'homebrew-theme');
+
+        // Add the selected theme class
+        if (selectedTheme === 'default') {
+            document.body.classList.add('default-theme');
+        } else if (selectedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else if (selectedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        } else if (selectedTheme === 'colorful') {
+            document.body.classList.add('colorful-theme');
+        } else if (selectedTheme === 'homebrew') {
+            document.body.classList.add('homebrew-theme'); // Apply Homebrew theme
+        }
+    }
+
+    </script>
+</body>
+</html>
