@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Fitness Guidebook</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #90e0ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gray-light: #ced4da;
+            --gray-dark: #343a40;
+            --body-bg: #f8f9fa;
+            --body-color: #212529;
+            --hiit: #f72585;
+            --pullup: #4361ee;
+            --handstand: #3a0ca3;
+            --splits: #7209b7;
+            --jumprope: #4cc9f0;
+            --juggling: #f8961e;
+            --core: #4895ef;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --body-bg: #121212;
+            --body-color: #e9ecef;
+            --light: #343a40;
+            --dark: #e9ecef;
+            --gray-light: #495057;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--body-bg);
+            color: var(--body-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+            padding-bottom: 50px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            position: relative;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin: 25px 0 15px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            color: var(--secondary);
+            margin: 20px 0 10px;
+        }
+
+        h4 {
+            margin: 15px 0 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul, ol {
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .card {
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collapsible:after {
+            content: "▼";
+            font-size: 0.8rem;
+            transition: transform 0.3s;
+        }
+
+        .collapsible.collapsed:after {
+            transform: rotate(-90deg);
+        }
+
+        .content {
+            display: block;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .content.collapsed {
+            max-height: 0;
+        }
+
+        .day-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .day-filter button {
+            background-color: var(--light);
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            font-weight: 500;
+        }
+
+        .day-filter button:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .day-filter button.active {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-small {
+            padding: 4px 10px;
+            font-size: 0.875rem;
+        }
+
+        /* Categories */
+        .category-hiit { border-left: 5px solid var(--hiit); }
+        .category-pullup { border-left: 5px solid var(--pullup); }
+        .category-handstand { border-left: 5px solid var(--handstand); }
+        .category-splits { border-left: 5px solid var(--splits); }
+        .category-jumprope { border-left: 5px solid var(--jumprope); }
+        .category-juggling { border-left: 5px solid var(--juggling); }
+        .category-core { border-left: 5px solid var(--core); }
+
+        .category-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .hiit-icon { background-color: var(--hiit); }
+        .pullup-icon { background-color: var(--pullup); }
+        .handstand-icon { background-color: var(--handstand); }
+        .splits-icon { background-color: var(--splits); }
+        .jumprope-icon { background-color: var(--jumprope); }
+        .juggling-icon { background-color: var(--juggling); }
+        .core-icon { background-color: var(--core); }
+
+        /* Checklist styling */
+        .checklist-item {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: flex-start;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 3px;
+            transform: scale(1.2);
+        }
+
+        .checklist-item.checked .checklist-text {
+            text-decoration: line-through;
+            color: var(--gray);
+        }
+
+        /* Progress tracker */
+        .progress-tracker {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            background-color: var(--body-bg);
+            color: var(--body-color);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        /* Timer component */
+        .timer {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Navigation */
+        .nav {
+            position: sticky;
+            top: 0;
+            background-color: var(--body-bg);
+            z-index: 1000;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .nav-link {
+            white-space: nowrap;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
+            transition: background-color 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Print specific styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+                font-size: 12pt;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+            .card {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            .content.collapsed {
+                max-height: none !important;
+                display: block !important;
+            }
+            header {
+                box-shadow: none;
+                color: black;
+                background-color: white;
+            }
+            h2, h3, h4 {
+                page-break-after: avoid;
+            }
+            ul, ol, p {
+                page-break-inside: avoid;
+            }
+            .checklist-item.checked .checklist-text {
+                text-decoration: line-through;
+                color: #888;
+            }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .day-filter {
+                justify-content: center;
+            }
+            .nav-links {
+                gap: 10px;
+            }
+            .nav-link {
+                padding: 5px 8px;
+                font-size: 0.9rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Search bar */
+        .search-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background-color: var(--body-bg);
+            color: var(--body-color);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--body-bg);
+            border: 1px solid var(--gray-light);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .search-result-item:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        /* Charts */
+        .chart-container {
+            margin: 20px 0;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Interactive Fitness Guidebook</h1>
+            <p>Your comprehensive training plan for multiple fitness goals</p>
+        </header>
+
+        <div class="nav no-print">
+            <div class="nav-links">
+                <a href="#weekly-schedule" class="nav-link">Schedule</a>
+                <a href="#hiit-cardio" class="nav-link">HIIT</a>
+                <a href="#pullup-guide" class="nav-link">Pull-ups</a>
+                <a href="#handstand-guide" class="nav-link">Handstand</a>
+                <a href="#splits-guide" class="nav-link">Splits</a>
+                <a href="#jumprope-guide" class="nav-link">Jump Rope</a>
+                <a href="#juggling-guide" class="nav-link">Juggling</a>
+                <a href="#progress-tracker" class="nav-link">Tracker</a>
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">🌓</button>
+        </div>
+
+        <div class="no-print">
+            <div class="search-container">
+                <input type="text" class="search-input" id="search-input" placeholder="Search for exercises, skills, or days...">
+                <div class="search-results" id="search-results"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="collapsible">Welcome! How to Use This Guidebook</h2>
+                <div class="content">
+                    <p>This interactive guidebook is designed to help you achieve multiple fitness goals through short, frequent training sessions. Here's how to use it:</p>
+                    <ul>
+                        <li><strong>Daily Checklist:</strong> Use the weekly schedule to check off completed workouts.</li>
+                        <li><strong>Detailed Guides:</strong> Expand each section to find specific instructions for every exercise.</li>
+                        <li><strong>Filter by Day:</strong> Use the day buttons to show only activities for a specific day.</li>
+                        <li><strong>Progress Tracking:</strong> Record your weekly progress in the tracker at the bottom.</li>
+                        <li><strong>Search:</strong> Use the search bar to quickly find specific exercises or instructions.</li>
+                        <li><strong>Dark Mode:</strong> Toggle the moon icon for light/dark mode.</li>
+                        <li><strong>Print Version:</strong> Click the Print button for a printer-friendly version.</li>
+                    </ul>
+                    <p>Your progress is automatically saved in your browser. Remember that consistency is key - even short sessions add up to significant progress over time!</p>
+                    <button class="btn" id="print-btn">Print Guidebook</button>
+                </div>
+            </div>
+
+            <div class="day-filter">
+                <button data-day="all" class="active">All Days</button>
+                <button data-day="monday">Monday</button>
+                <button data-day="tuesday">Tuesday</button>
+                <button data-day="wednesday">Wednesday</button>
+                <button data-day="thursday">Thursday</button>
+                <button data-day="friday">Friday</button>
+                <button data-day="saturday">Saturday</button>
+                <button data-day="sunday">Sunday</button>
+            </div>
+        </div>
+
+        <div id="weekly-schedule">
+            <div class="card">
+                <h2 class="collapsible">Weekly Schedule & Checklist</h2>
+                <div class="content">
+                    <div data-day="monday">
+                        <h3>Monday</h3>
+                        <div class="checklist-item" data-category="hiit">
+                            <input type="checkbox" id="monday-hiit">
+                            <div class="checklist-text">
+                                <label for="monday-hiit"><span class="category-icon hiit-icon"></span> Morning: 10-min HIIT cardio</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="jumprope">
+                            <input type="checkbox" id="monday-jumprope">
+                            <div class="checklist-text">
+                                <label for="monday-jumprope"><span class="category-icon jumprope-icon"></span> Morning: 5-min jump rope practice</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="pullup">
+                            <input type="checkbox" id="monday-pullup">
+                            <div class="checklist-text">
+                                <label for="monday-pullup"><span class="category-icon pullup-icon"></span> Midday: 15-min pull-up progression workout</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="handstand">
+                            <input type="checkbox" id="monday-handstand">
+                            <div class="checklist-text">
+                                <label for="monday-handstand"><span class="category-icon handstand-icon"></span> Evening: 10-min handstand practice</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="juggling">
+                            <input type="checkbox" id="monday-juggling">
+                            <div class="checklist-text">
+                                <label for="monday-juggling"><span class="category-icon juggling-icon"></span> Evening: 5-min juggling practice</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-day="tuesday">
+                        <h3>Tuesday</h3>
+                        <div class="checklist-item" data-category="splits">
+                            <input type="checkbox" id="tuesday-splits">
+                            <div class="checklist-text">
+                                <label for="tuesday-splits"><span class="category-icon splits-icon"></span> Morning: 15-min mobility & flexibility (splits focus)</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="jumprope">
+                            <input type="checkbox" id="tuesday-jumprope">
+                            <div class="checklist-text">
+                                <label for="tuesday-jumprope"><span class="category-icon jumprope-icon"></span> Midday: 10-min jump rope variations</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="core">
+                            <input type="checkbox" id="tuesday-core">
+                            <div class="checklist-text">
+                                <label for="tuesday-core"><span class="category-icon core-icon"></span> Evening: 10-min core strength</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="juggling">
+                            <input type="checkbox" id="tuesday-juggling">
+                            <div class="checklist-text">
+                                <label for="tuesday-juggling"><span class="category-icon juggling-icon"></span> Evening: 5-min juggling practice</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-day="wednesday">
+                        <h3>Wednesday</h3>
+                        <div class="checklist-item" data-category="hiit">
+                            <input type="checkbox" id="wednesday-hiit">
+                            <div class="checklist-text">
+                                <label for="wednesday-hiit"><span class="category-icon hiit-icon"></span> Morning: 10-min HIIT cardio</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="handstand">
+                            <input type="checkbox" id="wednesday-handstand">
+                            <div class="checklist-text">
+                                <label for="wednesday-handstand"><span class="category-icon handstand-icon"></span> Morning: 5-min handstand practice</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="pullup">
+                            <input type="checkbox" id="wednesday-pullup">
+                            <div class="checklist-text">
+                                <label for="wednesday-pullup"><span class="category-icon pullup-icon"></span> Midday: 15-min pull-up progression workout</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="splits">
+                            <input type="checkbox" id="wednesday-splits">
+                            <div class="checklist-text">
+                                <label for="wednesday-splits"><span class="category-icon splits-icon"></span> Evening: 10-min mobility & flexibility (splits focus)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-day="thursday">
+                        <h3>Thursday</h3>
+                        <div class="checklist-item" data-category="handstand">
+                            <input type="checkbox" id="thursday-handstand">
+                            <div class="checklist-text">
+                                <label for="thursday-handstand"><span class="category-icon handstand-icon"></span> Morning: 15-min handstand/press handstand practice</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="jumprope">
+                            <input type="checkbox" id="thursday-jumprope">
+                            <div class="checklist-text">
+                                <label for="thursday-jumprope"><span class="category-icon jumprope-icon"></span> Midday: 10-min jump rope intervals</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="core">
+                            <input type="checkbox" id="thursday-core">
+                            <div class="checklist-text">
+                                <label for="thursday-core"><span class="category-icon core-icon"></span> Evening: 10-min core strength</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="juggling">
+                            <input type="checkbox" id="thursday-juggling">
+                            <div class="checklist-text">
+                                <label for="thursday-juggling"><span class="category-icon juggling-icon"></span> Evening: 5-min juggling practice</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-day="friday">
+                        <h3>Friday</h3>
+                        <div class="checklist-item" data-category="hiit">
+                            <input type="checkbox" id="friday-hiit">
+                            <div class="checklist-text">
+                                <label for="friday-hiit"><span class="category-icon hiit-icon"></span> Morning: 10-min HIIT cardio</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="pullup">
+                            <input type="checkbox" id="friday-pullup">
+                            <div class="checklist-text">
+                                <label for="friday-pullup"><span class="category-icon pullup-icon"></span> Morning: 5-min pull-up work</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="splits">
+                            <input type="checkbox" id="friday-splits">
+                            <div class="checklist-text">
+                                <label for="friday-splits"><span class="category-icon splits-icon"></span> Midday: 15-min mobility & flexibility (splits focus)</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="handstand">
+                            <input type="checkbox" id="friday-handstand">
+                            <div class="checklist-text">
+                                <label for="friday-handstand"><span class="category-icon handstand-icon"></span> Evening: 10-min handstand practice</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="juggling">
+                            <input type="checkbox" id="friday-juggling">
+                            <div class="checklist-text">
+                                <label for="friday-juggling"><span class="category-icon juggling-icon"></span> Evening: 5-min juggling practice</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-day="saturday">
+                        <h3>Saturday</h3>
+                        <div class="checklist-item" data-category="all">
+                            <input type="checkbox" id="saturday-integrated">
+                            <div class="checklist-text">
+                                <label for="saturday-integrated">Morning: 20-min integrated practice (rotate between all skills)</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="all">
+                            <input type="checkbox" id="saturday-focus">
+                            <div class="checklist-text">
+                                <label for="saturday-focus">Afternoon: 15-min focused practice on weakest skill area</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-day="sunday">
+                        <h3>Sunday</h3>
+                        <div class="checklist-item" data-category="splits">
+                            <input type="checkbox" id="sunday-mobility">
+                            <div class="checklist-text">
+                                <label for="sunday-mobility"><span class="category-icon splits-icon"></span> Morning: 15-min light mobility & recovery</label>
+                            </div>
+                        </div>
+                        <div class="checklist-item" data-category="jumprope juggling">
+                            <input type="checkbox" id="sunday-skill">
+                            <div class="checklist-text">
+                                <label for="sunday-skill">Afternoon: 10-min skill maintenance (juggling & jump rope)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="training-guides">
+            <div class="card category-hiit" id="hiit-cardio">
+                <h2 class="collapsible">HIIT Cardio Guide</h2>
+                <div class="content">
+                    <p>High-Intensity Interval Training (HIIT) is perfect for fat loss and cardiovascular improvements in minimal time.</p>
+                    
+                    <div class="no-print">
+                        <h3>HIIT Timer</h3>
+                        <div class="timer">
+                            <div class="timer-display" id="hiit-timer">00:00</div>
+                            <div class="timer-controls">
+                                <button class="btn" id="hiit-start">Start</button>
+                                <button class="btn" id="hiit-pause">Pause</button>
+                                <button class="btn" id="hiit-reset">Reset</button>
+                            </div>
+                            <div class="form-row" style="margin-top: 10px;">
+                                <div class="form-group">
+                                    <label for="work-time">Work (sec)</label>
+                                    <input type="number" id="work-time" value="30" min="5" max="120">
+                                </div>
+                                <div class="form-group">
+                                    <label for="rest-time">Rest (sec)</label>
+                                    <input type="number" id="rest-time" value="30" min="5" max="120">
+                                </div>
+                                <div class="form-group">
+                                    <label for="rounds">Rounds</label>
+                                    <input type="number" id="rounds" value="10" min="1" max="20">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Jump Rope HIIT</h3>
+                    <ul>
+                        <li><strong>Basic Protocol</strong>: 30 seconds intense effort, 30 seconds recovery × 10 rounds</li>
+                        <li><strong>Beginner Option</strong>: 20 seconds work/40 seconds rest × 10 rounds</li>
+                        <li><strong>Advanced Option</strong>: 40 seconds work/20 seconds rest × 10 rounds</li>
+                        <li><strong>Jump Variations</strong>:
+                            <ul>
+                                <li>Regular two-foot jumps</li>
+                                <li>Alternating feet (running in place)</li>
+                                <li>High knees</li>
+                                <li>Double unders (advanced)</li>
+                                <li>Side-to-side jumps</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3>Exercise Bike HIIT</h3>
+                    <ul>
+                        <li><strong>Tabata Protocol</strong>: 20 seconds maximum effort, 10 seconds rest × 8 rounds (4 minutes)
+                            <ul>
+                                <li>Rest 1 minute, then repeat for a total of 2 sets</li>
+                            </ul>
+                        </li>
+                        <li><strong>30/30 Protocol</strong>: 30 seconds high resistance sprint, 30 seconds low resistance recovery × 10 rounds</li>
+                        <li><strong>Pyramid</strong>: Work intervals (15, 30, 45, 60 seconds) then decrease (60, 45, 30, 15 seconds) with equal rest</li>
