@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Dive: Presenter's Worksheet</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 0.75in;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #E8704C;
+            font-size: 24pt;
+            font-weight: 300;
+            margin-bottom: 10px;
+            page-break-after: avoid;
+        }
+
+        h2 {
+            color: #4A5FA5;
+            font-size: 13pt;
+            font-weight: 700;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 11pt;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            color: #333;
+            page-break-after: avoid;
+        }
+
+        .intro {
+            font-size: 10pt;
+            line-height: 1.4;
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .question {
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            color: #333;
+            page-break-after: avoid;
+        }
+
+        .answer-box {
+            width: 100%;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 3px solid #4A5FA5;
+            border: 1px solid #ddd;
+            border-left: 3px solid #4A5FA5;
+            margin-bottom: 20px;
+            min-height: 60px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+            resize: none;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .answer-box:focus {
+            outline: 2px solid #4A5FA5;
+            background-color: #fff;
+        }
+
+        .table-section {
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+
+        table th {
+            background-color: #7B8DBB;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 10pt;
+        }
+
+        table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            font-size: 9pt;
+            color: #999;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border: 2px solid #4A5FA5;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .controls button {
+            background-color: #4A5FA5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11pt;
+        }
+
+        .controls button:hover {
+            background-color: #3a4a85;
+        }
+
+        .controls input[type="file"] {
+            display: none;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .controls {
+                display: none;
+            }
+
+            .answer-box {
+                background-color: #f8f9fa !important;
+                border: 1px solid #ddd !important;
+                border-left: 3px solid #4A5FA5 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            table th {
+                background-color: #7B8DBB !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="window.print()">Print / Save as PDF</button>
+        <button onclick="downloadJSON()">Download JSON</button>
+        <button onclick="document.getElementById('fileInput').click()">Upload JSON</button>
+        <input type="file" id="fileInput" accept=".json" onchange="uploadJSON(event)">
+        <button onclick="clearAll()">Clear All</button>
+    </div>
+
+    <h1>Deep Dive: presenter's worksheet</h1>
+
+    <div class="intro">
+        Complete prior to your coaching session to help you organize your thoughts and dive into the complexities of your situation. You can use this structure as a basic outline for your Deep Dive. You may rework or update the document after your coaching session to include deeper issues uncovered.
+    </div>
+
+    <h2>1. Headline or Summary Statement</h2>
+    <div class="question">What do I want to explore with the Forum?</div>
+    <textarea class="answer-box" id="q1" placeholder="Type your answer here..."></textarea>
+
+    <h2>2. Context</h2>
+
+    <h3>a. Background:</h3>
+    <textarea class="answer-box" id="q2a" placeholder="Type your answer here..."></textarea>
+
+    <h3>b. Current situation:</h3>
+    <textarea class="answer-box" id="q2b" placeholder="Type your answer here..."></textarea>
+
+    <h3>c. Next steps I am considering:</h3>
+    <textarea class="answer-box" id="q2c" placeholder="Type your answer here..."></textarea>
+
+    <div class="page-break"></div>
+
+    <h2>3. Diving Deeper Into My Struggle</h2>
+
+    <h3>a. What is hardest for me?</h3>
+    <textarea class="answer-box" id="q3a" placeholder="Type your answer here..."></textarea>
+
+    <h3>b. How might my own actions be contributing to the challenge I face?</h3>
+    <textarea class="answer-box" id="q3b" placeholder="Type your answer here..."></textarea>
+
+    <h3>c. Where am I stuck?</h3>
+    <textarea class="answer-box" id="q3c" placeholder="Type your answer here..."></textarea>
+
+    <h3>d. What do I most want to change?</h3>
+    <textarea class="answer-box" id="q3d" placeholder="Type your answer here..."></textarea>
+
+    <h2>4. My Feelings</h2>
+
+    <h3>a. My strongest fear/uncertainty/concern:</h3>
+    <textarea class="answer-box" id="q4a" placeholder="Describe your feelings/emotions and where they're coming from..."></textarea>
+
+    <h3>b. A metaphor or image that comes to mind that describes my situation:</h3>
+    <textarea class="answer-box" id="q4b" placeholder="Type your answer here..."></textarea>
+
+    <div class="page-break"></div>
+
+    <h2>5. Looking Forward</h2>
+
+    <h3>a. My hope, dream or ideal outcome is…</h3>
+    <textarea class="answer-box" id="q5a" placeholder="Type your answer here..."></textarea>
+
+    <h3>b. What would failing mean for me and those around me?</h3>
+    <textarea class="answer-box" id="q5b" placeholder="Type your answer here..."></textarea>
+
+    <h3>c. What would success mean for me and those around me?</h3>
+    <textarea class="answer-box" id="q5c" placeholder="Type your answer here..."></textarea>
+
+    <h3>d. Are there any beliefs or biases I might need to shift in order to get what I want?</h3>
+    <textarea class="answer-box" id="q5d" placeholder="Type your answer here..."></textarea>
+
+    <h3>e. My core opportunity or dilemma might be...</h3>
+    <textarea class="answer-box" id="q5e" placeholder="Type your answer here..."></textarea>
+
+    <div class="footer">
+        EO Forum training program worksheets
+    </div>
+
+    <script>
+        // Auto-resize all textareas
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            // Set height to scrollHeight plus a little extra (2 lines worth)
+            const extraHeight = parseInt(window.getComputedStyle(textarea).lineHeight) * 2;
+            textarea.style.height = (textarea.scrollHeight + extraHeight) + 'px';
+        }
+
+        // Initialize all textareas
+        function initializeTextareas() {
+            const textareas = document.querySelectorAll('.answer-box');
+            textareas.forEach(textarea => {
+                // Auto-resize on input
+                textarea.addEventListener('input', function() {
+                    autoResize(this);
+                    saveToLocalStorage();
+                });
+
+                // Initial resize
+                autoResize(textarea);
+            });
+        }
+
+        // Save to localStorage
+        function saveToLocalStorage() {
+            const textareas = document.querySelectorAll('.answer-box');
+            textareas.forEach(textarea => {
+                localStorage.setItem('deepdive_' + textarea.id, textarea.value);
+            });
+            console.log('Progress saved!');
+        }
+
+        // Load from localStorage
+        function loadFromLocalStorage() {
+            const textareas = document.querySelectorAll('.answer-box');
+            textareas.forEach(textarea => {
+                const saved = localStorage.getItem('deepdive_' + textarea.id);
+                if (saved) {
+                    textarea.value = saved;
+                    autoResize(textarea);
+                }
+            });
+        }
+
+        // Download JSON
+        function downloadJSON() {
+            const data = {};
+            const textareas = document.querySelectorAll('.answer-box');
+            textareas.forEach(textarea => {
+                data[textarea.id] = textarea.value;
+            });
+
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+
+            // Create filename with current date
+            const date = new Date().toISOString().split('T')[0];
+            link.download = `deep_dive_${date}.json`;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Upload JSON
+        function uploadJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Warning before loading
+            if (!confirm('Warning: Uploading this file will overwrite all your current responses. Do you want to continue?')) {
+                event.target.value = ''; // Clear the file input
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    const textareas = document.querySelectorAll('.answer-box');
+
+                    textareas.forEach(textarea => {
+                        if (data[textarea.id] !== undefined) {
+                            textarea.value = data[textarea.id];
+                            autoResize(textarea);
+                            localStorage.setItem('deepdive_' + textarea.id, textarea.value);
+                        }
+                    });
+
+                    alert('Responses loaded successfully!');
+                } catch (error) {
+                    alert('Error loading file: Invalid JSON format');
+                }
+
+                event.target.value = ''; // Clear the file input
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Clear all
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all answers?')) {
+                const textareas = document.querySelectorAll('.answer-box');
+                textareas.forEach(textarea => {
+                    textarea.value = '';
+                    localStorage.removeItem('deepdive_' + textarea.id);
+                    autoResize(textarea);
+                });
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            initializeTextareas();
+            loadFromLocalStorage();
+        });
+
+        // Auto-save every 30 seconds
+        setInterval(saveToLocalStorage, 30000);
+    </script>
+</body>
+</html>
